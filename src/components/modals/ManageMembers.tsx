@@ -22,13 +22,9 @@ import {
 
 import UserAvatar from '../UserAvatar';
 import { useModal } from '@/hooks/useModalStore';
+import { roleIconMap } from '@/constants/icons';
 import { ServerWithMembers } from '@/types';
 
-const roleIconMap = {
-    "GUEST": null,
-    "MODERATOR": <ShieldCheck className='h-4 w-4 ml-2 text-indigo-500' />,
-    "ADMIN": <ShieldAlert className='h-4 w-4 ml-2 text-rose-500' />
-}
 
 function ManageMembersModal() {
     const { isOpen, type, data, onOpen, onClose } = useModal();
@@ -82,13 +78,13 @@ function ManageMembersModal() {
                     </DialogTitle>
 
                     <DialogDescription className='text-center text-zinc-500'>
-                        {server?.members.length} Members
+                        {server?.members?.length} Members
                     </DialogDescription>
                 </DialogHeader>
 
 
                 <ScrollArea className='max-h-[420px] mt-8 pr-6'>
-                    {server?.members.map((member) => (
+                    {server?.members?.map((member) => (
                         <div key={member.id} className='flex items-center gap-x-2 mb-6'>
                             <UserAvatar src={member.profile.imageUrl} />
 

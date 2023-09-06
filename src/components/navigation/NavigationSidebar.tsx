@@ -10,7 +10,7 @@ import { ScrollArea } from '../ui/scroll-area';
 
 import NavigationAction from './NavigationAction';
 import NavigationItem from './NavigationItem';
-import { ToggleThemeMode } from '../ToggleTheme';
+import { ToggleThemeMode } from '../toggles/ToggleTheme';
 
 
 async function NavigationSidebar() {
@@ -26,7 +26,7 @@ async function NavigationSidebar() {
     })
 
     return (
-        <div className='space-y-4 flex flex-col items-center h-full w-full text-primary bg-zinc-500 dark:bg-[#1E1F22] py-3'>
+        <div className='space-y-4 flex flex-col items-center h-full w-full text-primary bg-[#E3E5E8] dark:bg-[#1E1F22] py-3'>
             <NavigationAction />
             <Separator className='h-[2px] bg-zinc-300 dark:bg-zinc-700 rounded-md w-10 mx-auto' />
 

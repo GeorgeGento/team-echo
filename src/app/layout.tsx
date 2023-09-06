@@ -1,10 +1,14 @@
-import ModalProvider from '@/components/providers/ModalProvider'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
-import { cn } from '@/lib/utils'
-import '@/styles/globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Open_Sans } from 'next/font/google'
+
+import { cn } from '@/lib/utils'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import ModalProvider from '@/components/providers/ModalProvider'
+import { SocketProvider } from '@/components/providers/SocketProvider'
+import { QueryProvider } from '@/components/providers/QueryProvider'
+
+import '@/styles/globals.css'
 
 const font = Open_Sans({ subsets: ['latin'] })
 
@@ -23,8 +27,12 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={cn(font.className, "bg-white dark:bg-[#313338]")}>
           <ThemeProvider attribute='class' defaultTheme='dark' enableSystem storageKey='discord-theme'>
-            <ModalProvider />
-            {children}
+            <SocketProvider>
+              <ModalProvider />
+              <QueryProvider>
+                {children}
+              </QueryProvider>
+            </SocketProvider>
           </ThemeProvider>
         </body>
       </html>
