@@ -5,13 +5,13 @@ import axios from "axios";
 import qs from "query-string";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Member, MemberRole, Profile } from "@prisma/client";
+import { Member, MemberRole, User } from "@prisma/client";
 import { Edit, FileIcon, Trash } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-import UserAvatar from "@/components/UserAvatar";
+import UserAvatar from "@/components/user/UserAvatar";
 import ActionTooltip from "@/components/ActionTooltip";
 import { cn } from "@/lib/utils";
 import {
@@ -26,16 +26,14 @@ import { useModal } from "@/hooks/useModalStore";
 import { roleIconMap } from "@/constants/icons";
 import { ScrollArea } from "../ui/scroll-area";
 
-interface ChatItemProps {
+interface ConversationChatItemProps {
     id: string;
     content: string;
-    member: Member & {
-        profile: Profile;
-    };
+    author: User;
     timestamp: string;
     fileUrl: string | null;
     deleted: boolean;
-    currentMember: Member;
+    currentUser?: User;
     isUpdated: boolean;
     socketUrl: string;
     socketQuery: Record<string, string>;
@@ -45,20 +43,20 @@ const formSchema = z.object({
     content: z.string().min(1),
 });
 
-export const ChatItem = ({
-    id, content, member, timestamp,
-    fileUrl, deleted, currentMember,
+export default function ConversationChatItem({
+    id, content, author, timestamp,
+    fileUrl, deleted, currentUser,
     isUpdated, socketUrl, socketQuery
-}: ChatItemProps) => {
+}: ConversationChatItemProps) {
     const [isEditing, setIsEditing] = useState(false);
     const { onOpen } = useModal();
     const params = useParams();
     const router = useRouter();
 
     const onMemberClick = () => {
-        if (member.id === currentMember.id) return;
+        if (author?.id === currentUser?.id) return;
 
-        router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
+        router.push(`/channels/${params?.serverId}/${author?.id}`);
     }
 
     useEffect(() => {
@@ -102,10 +100,8 @@ export const ChatItem = ({
     }, [content]);
 
     const fileType = fileUrl?.split(".").pop();
-    const isAdmin = currentMember.role === MemberRole.ADMIN;
-    const isModerator = currentMember.role === MemberRole.MODERATOR;
-    const isOwner = currentMember.id === member.id;
-    const canDeleteMessage = !deleted && (isAdmin || isModerator || isOwner);
+    const isOwner = currentUser?.id === author?.id;
+    const canDeleteMessage = !deleted && isOwner;
     const canEditMessage = !deleted && isOwner && !fileUrl;
     const isPDF = fileType === "pdf" && fileUrl;
     const isImage = !isPDF && fileUrl;
@@ -115,18 +111,15 @@ export const ChatItem = ({
             <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
                 <div className="group flex gap-x-2 items-start w-full">
                     <div onClick={onMemberClick} className="cursor-pointer hover:drop-shadow-md transition">
-                        <UserAvatar src={member.profile.imageUrl} />
+                        <UserAvatar src={author?.imageUrl} />
                     </div>
 
                     <div className="flex flex-col w-full">
                         <div className="flex items-center gap-x-2">
                             <div className="flex items-center">
                                 <p onClick={onMemberClick} className="font-semibold text-sm hover:underline cursor-pointer">
-                                    {member.profile.name}
+                                    {author?.name}
                                 </p>
-                                <ActionTooltip label={member.role}>
-                                    {roleIconMap[member.role]}
-                                </ActionTooltip>
                             </div>
                             <span className="text-xs text-zinc-500 dark:text-zinc-400">
                                 {timestamp}

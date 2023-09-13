@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { DirectMessage } from "@prisma/client";
+import { Message } from "@prisma/client";
 
 import { currentProfile } from "@/lib/profile/serverSide";
 import { db } from "@/lib/db";
@@ -17,24 +17,20 @@ export async function GET(request: NextRequest) {
         if (!profile) return NextResponse.json({ message: "Unauthorized access" }, { status: 401 });
         if (!conversationId) return NextResponse.json({ message: "Conversation ID missing" }, { status: 400 });
 
-        let messages: DirectMessage[] = [];
+        let messages: Message[] = [];
         if (cursor) {
             messages = await db.directMessage.findMany({
                 take: MESSAGES_BATCH, skip: 1,
                 cursor: { id: cursor },
-                where: { conversationId },
-                include: {
-                    member: { include: { profile: true } }
-                },
+                where: { channelId: conversationId },
+                include: { author: true },
                 orderBy: { createdAt: "desc" }
             })
         } else {
             messages = await db.directMessage.findMany({
                 take: MESSAGES_BATCH,
-                where: { conversationId },
-                include: {
-                    member: { include: { profile: true } }
-                },
+                where: { channelId: conversationId },
+                include: { author: true },
                 orderBy: { createdAt: "desc" }
             });
         }

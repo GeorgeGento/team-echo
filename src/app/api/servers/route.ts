@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { currentProfile } from "@/lib/profile/serverSide";
 import { db } from "@/lib/db";
 import { MemberRole } from "@prisma/client";
+import { generateSnowflakeId } from "@/lib/generateSnowflakeId";
 
 export async function POST(request: NextRequest) {
     try {
@@ -14,17 +15,18 @@ export async function POST(request: NextRequest) {
 
         const server = await db.server.create({
             data: {
-                profileId: profile.id,
+                id: generateSnowflakeId(),
+                ownerId: profile.id,
                 name, imageUrl,
                 inviteCode: uuidv4(),
                 channels: {
                     create: [
-                        { name: "general", profileId: profile.id }
+                        { id: generateSnowflakeId(), name: "general" }
                     ]
                 },
                 members: {
                     create: [
-                        { profileId: profile.id, role: MemberRole.ADMIN }
+                        { id: generateSnowflakeId(), userId: profile.id, role: MemberRole.ADMIN }
                     ]
                 }
             }

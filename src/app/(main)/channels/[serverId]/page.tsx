@@ -12,15 +12,21 @@ type ServerIdPageProps = {
 }
 
 async function ServerIdPage({
-    params
+    params: { serverId }
 }: ServerIdPageProps) {
     const profile = await currentProfile();
     if (!profile) return redirectToSignIn();
 
+    if (serverId === profile.id) {
+        return (
+            <div>@ME</div>
+        )
+    }
+
     const server = await db.server.findUnique({
         where: {
-            id: params.serverId,
-            members: { some: { profileId: profile.id } }
+            id: serverId,
+            members: { some: { userId: profile.id } }
         },
         include: {
             channels: {
@@ -33,7 +39,7 @@ async function ServerIdPage({
     const initialChannel = server?.channels[0];
     if (initialChannel?.name !== "general") return null;
 
-    return redirect(`/servers/${params.serverId}/channels/${initialChannel?.id}`);
+    return redirect(`/channels/${serverId}/${initialChannel?.id}`);
 }
 
 export default ServerIdPage

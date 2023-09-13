@@ -3,6 +3,7 @@ import { NextApiRequest } from "next";
 import { NextApiResponseServerIo } from "@/types";
 import { currentProfile } from "@/lib/profile/serverSidePages";
 import { db } from "@/lib/db";
+import { generateSnowflakeId } from "@/lib/generateSnowflakeId";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
@@ -20,23 +21,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             where: {
                 id: conversationId as string,
                 OR: [
-                    { memberOne: { profileId: profile.id } },
-                    { memberTwo: { profileId: profile.id } },
+                    { currentUser: { id: profile.id } },
+                    { targetUser: { id: profile.id } },
                 ]
             },
             include: {
-                memberOne: { include: { profile: true } },
-                memberTwo: { include: { profile: true } }
+                currentUser: true,
+                targetUser: true
             }
         });
         if (!conversation) return res.status(404).json({ message: "Conversation not found" });
 
-        const member = conversation.memberOne.profileId === profile.id ? conversation.memberOne : conversation.memberTwo;
+        const member = conversation.currentUser.id === profile.id ? conversation.currentUser : conversation.targetUser;
         if (!member) return res.status(404).json({ message: "Member not found" });
 
         const message = await db.directMessage.create({
-            data: { content, fileUrl, conversationId: conversationId as string, memberId: member.id },
-            include: { member: { include: { profile: true } } }
+            data: { id: generateSnowflakeId(), content, fileUrl, channelId: conversationId as string, authorId: member.id },
+            include: { author: true }
         });
 
         const channelKey = `chat:${conversationId}:messages`;

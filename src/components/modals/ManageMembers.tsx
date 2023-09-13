@@ -20,7 +20,7 @@ import {
     DropdownMenuSubContent, DropdownMenuTrigger, DropdownMenuSubTrigger
 } from "../ui/dropdown-menu";
 
-import UserAvatar from '../UserAvatar';
+import UserAvatar from '../user/UserAvatar';
 import { useModal } from '@/hooks/useModalStore';
 import { roleIconMap } from '@/constants/icons';
 import { ServerWithMembers } from '@/types';

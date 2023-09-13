@@ -31,7 +31,7 @@ async function ServerSidebar({
                 orderBy: { createdAt: "asc" }
             },
             members: {
-                include: { profile: true },
+                include: { user: true },
                 orderBy: { role: "asc" }
             }
         }
@@ -41,8 +41,8 @@ async function ServerSidebar({
     const textChannels = server?.channels.filter((channel) => channel.type === ChannelType.TEXT);
     const audioChannels = server?.channels.filter((channel) => channel.type === ChannelType.AUDIO);
     const videoChannels = server?.channels.filter((channel) => channel.type === ChannelType.VIDEO);
-    const members = server?.members.filter((member) => member.profileId !== profile.id);
-    const role = server.members.find(member => member.profileId === profile.id)?.role;
+    const members = server?.members.filter((member) => member.userId !== profile.id);
+    const role = server.members.find(member => member.userId === profile.id)?.role;
 
     return (
         <div className='flex flex-col h-full w-full text-primary bg-zinc-300 dark:bg-[#2B2D31]'>
@@ -50,7 +50,7 @@ async function ServerSidebar({
 
             <ScrollArea className='px-3'>
                 <div className='mt-2'>
-                    <ServerSearch data={[
+                    <ServerSearch user={profile} data={[
                         {
                             label: "Text Channels",
                             type: "channel",
@@ -83,7 +83,7 @@ async function ServerSidebar({
                             type: "member",
                             data: members?.map((member) => ({
                                 id: member.id,
-                                name: member.profile.name,
+                                name: member.user.name,
                                 icon: roleIconMap[member.role],
                             }))
                         },
@@ -139,7 +139,7 @@ async function ServerSidebar({
                     />
 
                     {members?.map((member) => (
-                        <ServerMember key={member.id} member={member} server={server} />
+                        <ServerMember key={member.id} user={profile} member={member} server={server} />
                     ))}
                 </div>
             )}

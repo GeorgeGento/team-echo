@@ -1,7 +1,7 @@
 import React from 'react'
 import { Hash } from 'lucide-react'
 
-import UserAvatar from '../UserAvatar';
+import UserAvatar from '../user/UserAvatar';
 import MobileMenuToggle from '../toggles/MobileMenuToggle';
 import SocketIndicator from '../indicators/SocketIndicator';
 import ChatVideoButton from './ChatVideoButton';

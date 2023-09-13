@@ -13,7 +13,7 @@ export async function PATCH(request: NextRequest, { params: { serverId } }: { pa
         const { name, imageUrl } = await request.json();
 
         const server = await db.server.update({
-            where: { id: serverId, profileId: profile.id },
+            where: { id: serverId, ownerId: profile.id },
             data: { name, imageUrl }
         });
 
@@ -31,7 +31,7 @@ export async function DELETE(request: NextRequest, { params: { serverId } }: { p
         if (!serverId) return NextResponse.json({ message: "Server ID is missing." }, { status: 400 });
 
         const server = await db.server.delete({
-            where: { id: serverId, profileId: profile.id }
+            where: { id: serverId, ownerId: profile.id }
         });
 
         const fileNameArray = server.imageUrl.split("/");

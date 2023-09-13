@@ -2,7 +2,7 @@
 
 import { Fragment, useRef, ElementRef } from "react";
 import { format } from "date-fns";
-import { Member, Message, Profile } from "@prisma/client";
+import { DirectMessage, Member, Message, User } from "@prisma/client";
 import { Loader2, ServerCrash } from "lucide-react";
 
 import { useChatQuery } from "@/hooks/useChatQuery";
@@ -10,19 +10,21 @@ import { useChatSocket } from "@/hooks/useChatSocket";
 import { useChatScroll } from "@/hooks/useChatScroll";
 
 import { ChatWelcome } from "./ChatWelcome";
-import { ChatItem } from "./ChatItem";
+import ServerChatItem from "./ServerChatItem";
+import ConversationChatItem from "./ConversationChatItem";
 
 const DATE_FORMAT = "d MMM yyyy, HH:mm";
 
 type MessageWithMemberWithProfile = Message & {
-    member: Member & {
-        profile: Profile
+    author: Member & {
+        user: User
     }
 }
 
 interface ChatMessagesProps {
     name: string;
-    member: Member;
+    member?: Member;
+    user?: User;
     chatId: string;
     apiUrl: string;
     socketUrl: string;
@@ -33,7 +35,7 @@ interface ChatMessagesProps {
 }
 
 export const ChatMessages = ({
-    name, member, chatId, apiUrl,
+    name, member, user, chatId, apiUrl,
     socketUrl, socketQuery, paramKey,
     paramValue, type
 }: ChatMessagesProps) => {
@@ -103,14 +105,14 @@ export const ChatMessages = ({
                     )}
                 </div>
             )}
-            
-            <div className="flex flex-col-reverse mt-auto">
+
+            {type === "channel" && (<div className="flex flex-col-reverse mt-auto">
                 {data?.pages?.map((group, i) => (
                     <Fragment key={i}>
                         {group.items.map((message: MessageWithMemberWithProfile) => (
-                            <ChatItem key={message.id}
-                                id={message.id} currentMember={member}
-                                member={message.member} content={message.content}
+                            <ServerChatItem key={message.id}
+                                id={message.id} currentMember={member} author={message.author}
+                                content={message.content}
                                 fileUrl={message.fileUrl} deleted={message.deleted}
                                 timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
                                 isUpdated={message.updatedAt !== message.createdAt}
@@ -119,7 +121,24 @@ export const ChatMessages = ({
                         ))}
                     </Fragment>
                 ))}
-            </div>
+            </div>)}
+
+            {type === "conversation" && (<div className="flex flex-col-reverse mt-auto">
+                {data?.pages?.map((group, i) => (
+                    <Fragment key={i}>
+                        {group.items.map((message: DirectMessage & { author: User }) => (
+                            <ConversationChatItem key={message.id}
+                                id={message.id} currentUser={user}
+                                author={message.author} content={message.content}
+                                fileUrl={message.fileUrl} deleted={message.deleted}
+                                timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
+                                isUpdated={message.updatedAt !== message.createdAt}
+                                socketUrl={socketUrl} socketQuery={socketQuery}
+                            />
+                        ))}
+                    </Fragment>
+                ))}
+            </div>)}
             <div ref={bottomRef} />
         </div>
     )

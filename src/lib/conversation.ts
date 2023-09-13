@@ -1,25 +1,25 @@
 import { db } from "./db"
+import { generateSnowflakeId } from "./generateSnowflakeId";
 
-export const createConversation = async (memberOneId: string, memberTwoId: string) => {
-    let conversation = await findConversation(memberOneId, memberTwoId);
+export const createConversation = async (currentUserId: string, targetUserId: string) => {
+    let channel = await findConversation(currentUserId, targetUserId);
 
-    if (!conversation) conversation = await createNewConversation(memberOneId, memberTwoId);
+    if (!channel) channel = await createNewConversation(currentUserId, targetUserId);
 
-    return conversation;
+    return channel;
 }
 
-const findConversation = async (memberOneId: string, memberTwoId: string) => {
+export const getConversations = async (userId: string) => {
     try {
-        return await db.conversation.findFirst({
+        return await db.conversation.findMany({
             where: {
                 OR: [
-                    { AND: [{ memberOneId }, { memberTwoId }] },
-                    { AND: [{ memberTwoId }, { memberOneId }] }
+                    { currentUserId: userId }, { targetUserId: userId }
                 ]
             },
             include: {
-                memberOne: { include: { profile: true } },
-                memberTwo: { include: { profile: true } }
+                currentUser: true,
+                targetUser: true
             }
         });
     } catch (err) {
@@ -27,13 +27,32 @@ const findConversation = async (memberOneId: string, memberTwoId: string) => {
     }
 }
 
-const createNewConversation = async (memberOneId: string, memberTwoId: string) => {
+const findConversation = async (currentUserId: string, targetUserId: string) => {
+    try {
+        return await db.conversation.findFirst({
+            where: {
+                OR: [
+                    { AND: [{ currentUserId }, { targetUserId }] },
+                    { AND: [{ targetUserId }, { currentUserId }] },
+                ]
+            },
+            include: {
+                currentUser: true,
+                targetUser: true
+            }
+        });
+    } catch (err) {
+        return null;
+    }
+}
+
+const createNewConversation = async (currentUserId: string, targetUserId: string) => {
     try {
         return await db.conversation.create({
-            data: { memberOneId, memberTwoId },
+            data: { id: generateSnowflakeId(), currentUserId, targetUserId },
             include: {
-                memberOne: { include: { profile: true } },
-                memberTwo: { include: { profile: true } }
+                currentUser: true,
+                targetUser: true
             }
         });
     } catch (err) {

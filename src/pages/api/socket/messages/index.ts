@@ -3,6 +3,7 @@ import { NextApiRequest } from "next";
 import { NextApiResponseServerIo } from "@/types";
 import { currentProfile } from "@/lib/profile/serverSidePages";
 import { db } from "@/lib/db";
+import { generateSnowflakeId } from "@/lib/generateSnowflakeId";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponseServerIo) {
     if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
@@ -21,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             where: {
                 id: serverId as string,
                 members: {
-                    some: { profileId: profile.id }
+                    some: { userId: profile.id }
                 }
             },
             include: { members: true }
@@ -33,12 +34,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         });
         if (!channel) return res.status(404).json({ message: "Channel not found" });
 
-        const member = server.members.find(member => member.profileId === profile.id);
+        const member = server.members.find(member => member.userId === profile.id);
         if (!member) return res.status(404).json({ message: "Member not found" });
 
         const message = await db.message.create({
-            data: { content, fileUrl, channelId: channel.id, memberId: member.id },
-            include: { member: { include: { profile: true } } }
+            data: { id: generateSnowflakeId(), content, fileUrl, channelId: channel.id, authorId: member.id },
+            include: { author: { include: { user: true } } }
         });
 
         const channelKey = `chat:${channelId}:messages`;

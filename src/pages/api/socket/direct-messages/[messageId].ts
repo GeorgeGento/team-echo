@@ -22,36 +22,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             where: {
                 id: conversationId as string,
                 OR: [
-                    { memberOne: { profileId: profile.id } },
-                    { memberTwo: { profileId: profile.id } },
+                    { currentUser: { id: profile.id } },
+                    { targetUser: { id: profile.id } },
                 ]
             },
             include: {
-                memberOne: { include: { profile: true } },
-                memberTwo: { include: { profile: true } }
+                currentUser: true,
+                targetUser: true
             }
         });
         if (!conversation) return res.status(404).json({ message: "Conversation not found" });
 
-        const member = conversation.memberOne.profileId === profile.id ? conversation.memberOne : conversation.memberTwo;
+        const member = conversation.currentUser.id === profile.id ? conversation.currentUser : conversation.targetUser;
         if (!member) return res.status(404).json({ message: "Member not found" });
 
         let message = await db.directMessage.findFirst({
-            where: { id: messageId as string, conversationId: conversationId as string },
-            include: { member: { include: { profile: true } } }
+            where: { id: messageId as string, channelId: conversationId as string },
+            include: { author: true }
         });
         if (!message || message.deleted) return res.status(404).json({ message: "Message not found" });
 
-        const isMessageOwner = message.memberId === member.id;
-        const isAdmin = member.role === MemberRole.ADMIN;
-        const isModerator = member.role === MemberRole.MODERATOR;
-        const canModify = isMessageOwner || isAdmin || isModerator;
-        if (!canModify) return res.status(401).json({ message: "Unauthorized" });
+        const isMessageOwner = message.authorId === member.id;
+        if (!isMessageOwner) return res.status(401).json({ message: "Unauthorized" });
 
         if (req.method === "DELETE") message = await db.directMessage.update({
             where: { id: messageId as string },
             data: { fileUrl: null, deleted: true, content: "This message has been deleted." },
-            include: { member: { include: { profile: true } } }
+            include: { author: true }
         });
 
         if (req.method === "PATCH") {
@@ -60,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             message = await db.directMessage.update({
                 where: { id: messageId as string },
                 data: { content },
-                include: { member: { include: { profile: true } } }
+                include: { author: true }
             });
         }
 

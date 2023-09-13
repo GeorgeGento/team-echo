@@ -13,10 +13,10 @@ export async function PATCH(request: NextRequest, { params: { serverId } }: { pa
 
         const server = await db.server.update({
             where: {
-                id: serverId, profileId: { not: profile.id },
-                members: { some: { profileId: profile.id } }
+                id: serverId, ownerId: { not: profile.id },
+                members: { some: { userId: profile.id } }
             },
-            data: { members: { deleteMany: { profileId: profile.id } } }
+            data: { members: { deleteMany: { userId: profile.id } } }
         });
 
         return NextResponse.json(server, { status: 200 });

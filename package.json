@@ -1,5 +1,5 @@
 {
-	"name": "discord-clone",
+	"name": "team-echo",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -37,11 +37,13 @@
 		"emoji-mart": "^5.5.2",
 		"eslint": "8.48.0",
 		"eslint-config-next": "13.4.12",
+		"flakeid": "^1.0.1",
 		"livekit-client": "^1.13.2",
 		"livekit-server-sdk": "^1.2.6",
 		"lucide-react": "^0.274.0",
 		"next": "13.4.12",
 		"next-themes": "^0.2.1",
+		"nodejs-snowflake": "^2.0.1",
 		"postcss": "8.4.29",
 		"query-string": "^8.1.0",
 		"react": "18.2.0",

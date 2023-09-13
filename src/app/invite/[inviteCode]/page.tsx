@@ -1,8 +1,8 @@
+import { redirect } from 'next/navigation';
+import { redirectToSignIn } from '@clerk/nextjs';
+
 import { db } from '@/lib/db';
 import { currentProfile } from '@/lib/profile/serverSide';
-import { redirectToSignIn } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
-import React from 'react'
 
 type InvitePageProps = {
     params: {
@@ -19,22 +19,28 @@ async function InvitePage({ params: { inviteCode } }: InvitePageProps) {
         where: {
             inviteCode: inviteCode,
             members: {
-                some: { profileId: profile.id }
+                some: { userId: profile.id }
             }
+        },
+        include: {
+            channels: { where: { name: "general" } }
         }
     });
-    if (existingServer) return redirect(`/servers/${existingServer.id}`);
+    if (existingServer) return redirect(`/channels/${existingServer.id}/${existingServer.channels[0]}`);
 
     const server = await db.server.update({
         where: { inviteCode },
         data: {
             members: {
-                create: [{ profileId: profile.id }]
+                create: [{ userId: profile.id }]
             }
+        },
+        include: {
+            channels: { where: { name: "general" } }
         }
     })
 
-    if (server) return redirect(`/servers/${server.id}`);
+    if (server) return redirect(`/channels/${server.id}/${server.channels[0]}`);
 
     return null;
 }

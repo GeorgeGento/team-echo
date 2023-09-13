@@ -15,18 +15,18 @@ export async function PATCH(request: NextRequest, { params: { memberId } }: { pa
         if (!serverId) return NextResponse.json({ message: "Server ID is missing." }, { status: 400 });
 
         const server = await db.server.update({
-            where: { id: serverId, profileId: profile.id },
+            where: { id: serverId, ownerId: profile.id },
             data: {
                 members: {
                     update: {
-                        where: { id: memberId, profileId: { not: profile.id } },
+                        where: { id: memberId, userId: { not: profile.id } },
                         data: { role }
                     }
                 }
             },
             include: {
                 members: {
-                    include: { profile: true },
+                    include: { user: true },
                     orderBy: { role: "asc" }
                 }
             }
@@ -50,18 +50,18 @@ export async function DELETE(request: NextRequest, { params: { memberId } }: { p
         if (!serverId) return NextResponse.json({ message: "Server ID is missing." }, { status: 400 });
 
         const server = await db.server.update({
-            where: { id: serverId, profileId: profile.id },
+            where: { id: serverId, ownerId: profile.id },
             data: {
                 members: {
                     deleteMany: {
                         id: memberId,
-                        profileId: { not: profile.id }
+                        userId: { not: profile.id }
                     }
                 }
             },
             include: {
                 members: {
-                    include: { profile: true },
+                    include: { user: true },
                     orderBy: { role: "asc" }
                 }
             }

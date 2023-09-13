@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest, { params: { channelId } }: { p
                 id: serverId,
                 members: {
                     some: {
-                        profileId: profile.id,
+                        userId: profile.id,
                         role: { in: [MemberRole.MODERATOR, MemberRole.ADMIN] }
                     }
                 }
@@ -59,7 +59,7 @@ export async function DELETE(request: NextRequest, { params: { channelId } }: { 
                 id: serverId,
                 members: {
                     some: {
-                        profileId: profile.id,
+                        userId: profile.id,
                         role: { in: [MemberRole.MODERATOR, MemberRole.ADMIN] }
                     }
                 }

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
+import { User } from '@prisma/client';
 
 import {
     CommandDialog, CommandEmpty, CommandGroup,
@@ -10,6 +11,7 @@ import {
 } from '../ui/command';
 
 interface ServerSearchProps {
+    user: User;
     data: {
         label: string;
         type: "channel" | "member",
@@ -22,7 +24,7 @@ interface ServerSearchProps {
 }
 
 function ServerSearch({
-    data
+    data, user
 }: ServerSearchProps) {
     const [open, setOpen] = useState(false);
     const router = useRouter();
@@ -44,11 +46,11 @@ function ServerSearch({
         setOpen(false);
 
         if (type === "member")
-            return router.push(`/servers/${params?.serverId}/conversations/${id}`);
+            return router.push(`/channels/${user.id}/${id}`);
 
 
         if (type === "channel")
-            return router.push(`/servers/${params?.serverId}/channels/${id}`);
+            return router.push(`/channels/${params?.serverId}/${id}`);
     }
 
     return (

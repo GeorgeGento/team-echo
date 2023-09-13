@@ -69,6 +69,26 @@ html, body, :root {
     --ring: 24 5.7% 82.9%;
   }
 }
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #161718 rgb(113, 113, 113);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgb(82, 82, 82);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #161718;
+  border-radius: 14px;
+}
  
 @layer base {
   * {

@@ -1,25 +1,26 @@
 "use client"
 
 import React from 'react'
-import { Member, Profile, Server } from '@prisma/client'
+import { Member, Server, User } from '@prisma/client'
 import { useParams, useRouter } from 'next/navigation';
 
 import { cn } from '@/lib/utils';
-import UserAvatar from '../UserAvatar';
+import UserAvatar from '../user/UserAvatar';
 import { roleIconMap } from '@/constants/icons';
 
 type ServerMemberProps = {
-    member: Member & { profile: Profile };
+    user: User;
+    member: Member & { user: User };
     server: Server;
 }
 
-function ServerMember({ member, server }: ServerMemberProps) {
+function ServerMember({ member, server, user }: ServerMemberProps) {
     const router = useRouter();
     const params = useParams();
     const icon = roleIconMap[member.role];
 
     const onClick = () => {
-        router.push(`/servers/${server.id}/conversations/${member.id}`)
+        router.push(`/channels/${user.id}/${member.id}`)
     }
 
     return (
@@ -31,7 +32,7 @@ function ServerMember({ member, server }: ServerMemberProps) {
             )}
         >
             <UserAvatar
-                src={member.profile.imageUrl}
+                src={member.user.imageUrl}
                 className="h-8 w-8 md:h-8 md:w-8"
             />
             <p
@@ -40,7 +41,7 @@ function ServerMember({ member, server }: ServerMemberProps) {
                     params?.memberId === member.id && "text-primary dark:text-zinc-200 dark:group-hover:text-white"
                 )}
             >
-                {member.profile.name}
+                {member.user.name}
             </p>
             {icon}
         </button>

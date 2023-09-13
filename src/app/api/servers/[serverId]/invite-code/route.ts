@@ -12,7 +12,7 @@ export async function PATCH(request: NextRequest, { params: { serverId } }: { pa
         if (!serverId) return NextResponse.json({ message: "Server ID is missing." }, { status: 400 });
 
         const server = await db.server.update({
-            where: { id: serverId, profileId: profile.id },
+            where: { id: serverId, ownerId: profile.id },
             data: { inviteCode: uuidv4() }
         });
 

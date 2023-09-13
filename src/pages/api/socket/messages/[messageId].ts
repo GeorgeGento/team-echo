@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             where: {
                 id: serverId as string,
                 members: {
-                    some: { profileId: profile.id }
+                    some: { userId: profile.id }
                 }
             },
             include: { members: true }
@@ -35,16 +35,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         });
         if (!channel) return res.status(404).json({ message: "Channel not found" });
 
-        const member = server.members.find(member => member.profileId === profile.id);
+        const member = server.members.find(member => member.userId === profile.id);
         if (!member) return res.status(404).json({ message: "Member not found" });
 
         let message = await db.message.findFirst({
             where: { id: messageId as string, channelId: channelId as string },
-            include: { member: { include: { profile: true } } }
+            include: { author: { include: { user: true } } }
         });
         if (!message || message.deleted) return res.status(404).json({ message: "Message not found" });
 
-        const isMessageOwner = message.memberId === member.id;
+        const isMessageOwner = message.authorId === member.id;
         const isAdmin = member.role === MemberRole.ADMIN;
         const isModerator = member.role === MemberRole.MODERATOR;
         const canModify = isMessageOwner || isAdmin || isModerator;
@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         if (req.method === "DELETE") message = await db.message.update({
             where: { id: messageId as string },
             data: { fileUrl: null, deleted: true, content: "This message has been deleted." },
-            include: { member: { include: { profile: true } } }
+            include: { author: { include: { user: true } } }
         });
 
         if (req.method === "PATCH") {
@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             message = await db.message.update({
                 where: { id: messageId as string },
                 data: { content },
-                include: { member: { include: { profile: true } } }
+                include: { author: { include: { user: true } } }
             });
         }
 

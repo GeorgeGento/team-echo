@@ -5,13 +5,10 @@ import { db } from "../db";
 
 export const currentProfile = async (req: NextApiRequest) => {
     const { userId } = getAuth(req);
-
     if (!userId) return null;
 
-    const profile = await db.profile.findUnique({
-        where: {
-            userId
-        }
+    const profile = await db.user.findUnique({
+        where: { userId },
     });
 
     return profile;

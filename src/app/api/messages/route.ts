@@ -22,18 +22,18 @@ export async function GET(request: NextRequest) {
             messages = await db.message.findMany({
                 take: MESSAGES_BATCH, skip: 1,
                 cursor: { id: cursor },
-                where: { channelId },
+                where: { channelId: channelId },
                 include: {
-                    member: { include: { profile: true } }
+                    author: { include: { user: true } }
                 },
                 orderBy: { createdAt: "desc" }
             })
         } else {
             messages = await db.message.findMany({
                 take: MESSAGES_BATCH,
-                where: { channelId },
+                where: { channelId: channelId },
                 include: {
-                    member: { include: { profile: true } }
+                    author: { include: { user: true } }
                 },
                 orderBy: { createdAt: "desc" }
             });
