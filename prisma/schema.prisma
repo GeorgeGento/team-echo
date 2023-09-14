@@ -26,6 +26,9 @@ model User {
   friendsInitiated Friend[] @relation("CurrentUser")
   friendsReceived Friend[] @relation("TargetUser")
 
+  blockedInitiated BlockedUser[] @relation("CurrentUser")
+  blockedReceived BlockedUser[] @relation("TargetUser")
+
   conversationsInitiated Conversation[] @relation("CurrentUser")
   conversationsReceived Conversation[] @relation("TargetUser")
 
@@ -159,6 +162,22 @@ model DirectMessage {
 model Friend {
   id String @id @default(uuid())
   accepted Boolean @default(false)
+
+  currentUserId String
+  currentUser User @relation("CurrentUser", fields: [currentUserId], references: [id], onDelete: Cascade)
+
+  targetUserId String
+  targetUser User @relation("TargetUser", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([currentUserId])
+  @@index([targetUserId])
+}
+
+model BlockedUser {
+  id String @id @default(uuid())
 
   currentUserId String
   currentUser User @relation("CurrentUser", fields: [currentUserId], references: [id], onDelete: Cascade)

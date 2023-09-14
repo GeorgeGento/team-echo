@@ -1,13 +1,21 @@
 import React from 'react'
 import { Menu } from 'lucide-react'
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet'
-import { Button } from '../ui/button'
+import { redirect } from 'next/navigation'
+
+import { currentProfile } from '@/lib/profile/clientSide'
 import NavigationSidebar from '../navigation/NavigationSidebar'
 import ServerSidebar from '../server/ServerSidebar'
+import UserSidebar from '../user/UserSidebar'
 
-function MobileMenuToggle({
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet'
+import { Button } from '../ui/button'
+
+export default async function MobileMenuToggle({
     serverId
 }: { serverId: string }) {
+    const profile = await currentProfile();
+    if (!profile) return redirect("/");
+
     return (
         <Sheet>
             <SheetTrigger asChild>
@@ -21,10 +29,9 @@ function MobileMenuToggle({
                     <NavigationSidebar />
                 </div>
 
-                <ServerSidebar serverId={serverId} />
+                {serverId !== profile.id && (<ServerSidebar serverId={serverId} />)}
+                {serverId === profile.id && (<UserSidebar serverId={serverId} />)}
             </SheetContent>
         </Sheet>
     )
 }
-
-export default MobileMenuToggle

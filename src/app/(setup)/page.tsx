@@ -8,5 +8,5 @@ export default async function SetupPage() {
   const profile = await currentProfile();
   if (!profile) return redirectToSignIn();
 
-  return redirect(`/channels/${profile.id}`);
+  return redirect(`/channels/${profile.id}?${new URLSearchParams({ display: "friends", type: "all" }).toString()}`);
 }

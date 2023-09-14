@@ -4,22 +4,27 @@ import { redirectToSignIn } from '@clerk/nextjs';
 
 import { db } from '@/lib/db';
 import { currentProfile } from '@/lib/profile/clientSide';
+import HomePage from '@/components/user/HomePage';
 
 type ServerIdPageProps = {
     params: {
         serverId: string;
-    }
+    };
+    searchParams: {
+        display: string;
+        type: string;
+    };
 }
 
 async function ServerIdPage({
-    params: { serverId }
+    params: { serverId }, searchParams
 }: ServerIdPageProps) {
     const profile = await currentProfile();
     if (!profile) return redirectToSignIn();
 
     if (serverId === profile.id) {
         return (
-            <div>@ME</div>
+            <HomePage serverId={serverId} searchParams={searchParams} />
         )
     }
 

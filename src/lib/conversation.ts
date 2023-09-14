@@ -33,7 +33,7 @@ const findConversation = async (currentUserId: string, targetUserId: string) => 
             where: {
                 OR: [
                     { AND: [{ currentUserId }, { targetUserId }] },
-                    { AND: [{ targetUserId }, { currentUserId }] },
+                    { AND: [{ currentUserId: targetUserId }, { targetUserId: currentUserId }] },
                 ]
             },
             include: {

@@ -26,7 +26,7 @@ async function InvitePage({ params: { inviteCode } }: InvitePageProps) {
             channels: { where: { name: "general" } }
         }
     });
-    if (existingServer) return redirect(`/channels/${existingServer.id}/${existingServer.channels[0]}`);
+    if (existingServer) return redirect(`/channels/${existingServer.id}/${existingServer.channels[0].id}`);
 
     const server = await db.server.update({
         where: { inviteCode },
@@ -40,7 +40,7 @@ async function InvitePage({ params: { inviteCode } }: InvitePageProps) {
         }
     })
 
-    if (server) return redirect(`/channels/${server.id}/${server.channels[0]}`);
+    if (server) return redirect(`/channels/${server.id}/${server.channels[0].id}`);
 
     return null;
 }

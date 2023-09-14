@@ -30,10 +30,10 @@ export default async function ChannelIdPage({
 
     if (serverId === user.id) {
         const conversation = await createConversation(user.id, channelId);
-        if (!conversation) return redirect(`/channels/${serverId}`);
+        if (!conversation) return redirect(`/channels/${serverId}?${new URLSearchParams({ display: "friends", type: "all" }).toString()}`);
 
         const { currentUser, targetUser } = conversation;
-        const otherMember = currentUser.id === user.id ? currentUser : targetUser;
+        const otherMember = currentUser.id === user.id ? targetUser : currentUser;
 
         return (
             <div className='bg-white dark:bg-[#313338] flex flex-col h-full'>
