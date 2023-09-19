@@ -17,7 +17,7 @@ export const currentProfile = async () => {
         data: {
             id: generateSnowflakeId(),
             userId: user.id,
-            name: `${user.firstName} ${user.lastName}`,
+            name: `${user.username}`,
             imageUrl: user.imageUrl,
             email: user.emailAddresses[0].emailAddress
         }
