@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { currentProfile } from "@/lib/profile/serverSide"
+import { currentProfile } from "@/lib/profile/clientSide"
 import HomePage from "@/components/homePage"
 
 
