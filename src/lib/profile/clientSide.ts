@@ -1,11 +1,11 @@
-import { currentUser, redirectToSignIn } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs";
 
 import { db } from "../db";
 import { generateSnowflakeId } from "../generateSnowflakeId";
 
 export const currentProfile = async () => {
     const user = await currentUser();
-    if (!user) return redirectToSignIn();
+    if (!user) return null;
 
     const profile = await db.user.findUnique({
         where: { userId: user.id }
