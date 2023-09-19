@@ -149,6 +149,23 @@ export const getBlockedUsers = async (userId: string) => {
     }
 }
 
+export const isBlocked = async (currentUserId: string, targetUserId: string) => {
+    try {
+        const blocked = await db.blockedUser.findFirst({
+            where: {
+                OR: [
+                    { AND: [{ currentUserId }, { targetUserId }] },
+                    { AND: [{ currentUserId: targetUserId }, { targetUserId: currentUserId }] }
+                ]
+            }
+        });
+
+        return blocked;
+    } catch (err) {
+        return null;
+    }
+}
+
 export const blockUser = async (currentUserId: string, targetUserId: string) => {
     try {
         const blockedUser = await db.blockedUser.create({

@@ -1,12 +1,17 @@
 import { redirect } from "next/navigation";
-import { redirectToSignIn } from "@clerk/nextjs";
 
-import { currentProfile } from "@/lib/profile/clientSide"
+import { currentProfile } from "@/lib/profile/serverSide"
+import HomePage from "@/components/homePage"
 
 
 export default async function SetupPage() {
   const profile = await currentProfile();
-  if (!profile) return redirectToSignIn();
+
+  if (!profile) return (
+    <div>
+      <HomePage />
+    </div>
+  );
 
   return redirect(`/channels/${profile.id}?${new URLSearchParams({ display: "friends", type: "all" }).toString()}`);
 }

@@ -23,6 +23,9 @@ model User {
   members Member[]
   messages DirectMessage[]
 
+  directMessageSettings DirectMessageSettings?
+  friendRequestSettings FriendRequestSettings?
+
   friendsInitiated Friend[] @relation("CurrentUser")
   friendsReceived Friend[] @relation("TargetUser")
 
@@ -41,6 +44,7 @@ model Server {
   name String
   imageUrl String @db.Text
   inviteCode String @unique
+  isPublic Boolean @default(false)
 
   ownerId String
   owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -190,4 +194,30 @@ model BlockedUser {
 
   @@index([currentUserId])
   @@index([targetUserId])
+}
+
+model DirectMessageSettings {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  everyone Boolean @default(true)
+  friendOfFriends Boolean @default(true)
+  ServerMembers Boolean @default(true)
+
+  @@index([userId])
+}
+
+model FriendRequestSettings {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  everyone Boolean @default(true)
+  friendOfFriends Boolean @default(true)
+  ServerMembers Boolean @default(true)
+
+  @@index([userId])
 }
