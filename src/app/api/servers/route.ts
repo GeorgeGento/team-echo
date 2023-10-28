@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
                 id: generateSnowflakeId(),
                 ownerId: profile.id,
                 name, imageUrl,
-                inviteCode: uuidv4(),
+                inviteCode: generateSnowflakeId(),
                 channels: {
                     create: [
                         { id: generateSnowflakeId(), name: "general" }

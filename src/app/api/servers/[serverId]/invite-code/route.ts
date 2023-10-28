@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
 import { db } from "@/lib/db";
 import { currentProfile } from "@/lib/profile/serverSide";
+import { generateSnowflakeId } from "@/lib/generateSnowflakeId";
 
 export async function PATCH(request: NextRequest, { params: { serverId } }: { params: { serverId: string } }) {
     try {
@@ -13,7 +13,7 @@ export async function PATCH(request: NextRequest, { params: { serverId } }: { pa
 
         const server = await db.server.update({
             where: { id: serverId, ownerId: profile.id },
-            data: { inviteCode: uuidv4() }
+            data: { inviteCode: generateSnowflakeId() }
         });
 
         return NextResponse.json(server, { status: 200 });
